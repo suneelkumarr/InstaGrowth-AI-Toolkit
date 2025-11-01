@@ -1,30 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import * as geminiService from '../services/geminiService';
 import { HookAnalysisReport } from '../types';
 import { SparklesIcon, BoltIcon } from './common/icons';
 import LoadingSpinner from './common/LoadingSpinner';
 
-const HookAnalyser: React.FC = () => {
+interface HookAnalyserProps {
+    initialHook: string | null;
+    onAnalysisDone: () => void;
+}
+
+const HookAnalyser: React.FC<HookAnalyserProps> = ({ initialHook, onAnalysisDone }) => {
     const [text, setText] = useState('');
     const [analysis, setAnalysis] = useState<HookAnalysisReport | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!text) return;
+    const performAnalysis = async (hookText: string) => {
+        if (!hookText) return;
 
         setIsLoading(true);
         setError(null);
         setAnalysis(null);
         try {
-            const result = await geminiService.getHookAnalysis(text);
+            const result = await geminiService.getHookAnalysis(hookText);
             setAnalysis(result);
         } catch (err) {
             setError('Failed to analyze hook. Please check your Gemini API key.');
         } finally {
             setIsLoading(false);
         }
+    };
+
+    useEffect(() => {
+        if (initialHook) {
+            setText(initialHook);
+            performAnalysis(initialHook);
+            onAnalysisDone();
+        }
+    }, [initialHook, onAnalysisDone]);
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        performAnalysis(text);
     };
 
     const getScoreColor = (score: number) => {

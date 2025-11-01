@@ -17,7 +17,11 @@ const HOOK_STYLES = [
     'Direct Call to Action',
 ];
 
-const HookCreator: React.FC = () => {
+interface HookCreatorProps {
+    onAnalyzeHook: (hook: string) => void;
+}
+
+const HookCreator: React.FC<HookCreatorProps> = ({ onAnalyzeHook }) => {
     const [topic, setTopic] = useState('');
     const [style, setStyle] = useState(HOOK_STYLES[0]);
     const [hooks, setHooks] = useState<string[]>([]);
@@ -97,12 +101,20 @@ const HookCreator: React.FC = () => {
                     {hooks.map((hook, index) => (
                         <div key={index} className="bg-gray-800/50 p-4 rounded-lg flex justify-between items-center gap-4">
                            <p className="text-gray-200 flex-grow">"{hook}"</p>
-                           <button 
-                             onClick={() => handleCopy(hook)}
-                             className="text-xs px-3 py-1 bg-gray-700 hover:bg-indigo-600 text-white font-semibold rounded-md transition-colors flex-shrink-0"
-                           >
-                            {copiedHook === hook ? 'Copied!' : 'Copy'}
-                           </button>
+                           <div className="flex-shrink-0 flex items-center gap-2">
+                               <button 
+                                 onClick={() => onAnalyzeHook(hook)}
+                                 className="text-xs px-3 py-1 bg-gray-700 hover:bg-indigo-600 text-white font-semibold rounded-md transition-colors"
+                               >
+                                Analyze
+                               </button>
+                               <button 
+                                 onClick={() => handleCopy(hook)}
+                                 className="text-xs px-3 py-1 bg-gray-700 hover:bg-indigo-600 text-white font-semibold rounded-md transition-colors"
+                               >
+                                {copiedHook === hook ? 'Copied!' : 'Copy'}
+                               </button>
+                           </div>
                         </div>
                     ))}
                 </div>

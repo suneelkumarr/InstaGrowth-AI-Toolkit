@@ -8,6 +8,7 @@ type View = 'user' | 'performance' | 'competitor' | 'discovery' | 'postingTime' 
 const App: React.FC = () => {
   const [activeView, setActiveView] = useState<View>('user');
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [hookToAnalyze, setHookToAnalyze] = useState<string | null>(null);
 
   useEffect(() => {
     const hasCompletedOnboarding = localStorage.getItem('hasCompletedOnboarding');
@@ -19,6 +20,11 @@ const App: React.FC = () => {
   const handleOnboardingComplete = () => {
     localStorage.setItem('hasCompletedOnboarding', 'true');
     setShowOnboarding(false);
+  };
+
+  const handleAnalyzeHookRequest = (hook: string) => {
+    setHookToAnalyze(hook);
+    setActiveView('hookAnalyser');
   };
 
 
@@ -43,9 +49,9 @@ const App: React.FC = () => {
       case 'collab':
         return <CollabMatcher />;
       case 'hookAnalyser':
-        return <HookAnalyser />;
+        return <HookAnalyser initialHook={hookToAnalyze} onAnalysisDone={() => setHookToAnalyze(null)} />;
       case 'hookCreator':
-        return <HookCreator />;
+        return <HookCreator onAnalyzeHook={handleAnalyzeHookRequest} />;
       case 'calendar':
         return <ContentCalendar />;
       default:
